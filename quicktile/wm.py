@@ -155,6 +155,17 @@ class WindowManager(object):
                 if result:
                     struts.append(StrutPartial(*result))
                     logging.debug("Gathered _NET_WM_STRUT value: %s", struts)
+                else:
+                    # TODO: Not a full solution, we assume that all workspaces are the same
+                    # This may work on most cases.
+                    result = self.get_property(win, "_GTK_WORKAREAS_D0", Xatom.CARDINAL)
+                    if result:
+                        logging.debug("Gathered GTK_WORKAREA value: %s", result)
+                        left, top, right, bottom = result
+                        strut = StrutPartial(
+                            left=left, top=top, right=right + left, bottom=bottom + top
+                        )
+                        struts.append(strut)
 
         # Get the list of struts from the root window
         self.usable_region.set_panels(struts)
